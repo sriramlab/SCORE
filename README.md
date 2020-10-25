@@ -57,16 +57,16 @@ The values in the brackets are the command line flags for running the code witho
 
 An example parameter file is provided in the example directory. 
 You can run the code using the command: 
-To compute heritability and genetic correlation: 
+To compute genetic correlation: 
 ```
-../build/RHE_reg -g 200_100 -p 200_100.pheno.plink -c 200_100.cov -b 10 
+./build/SCORE -g ./example/all -p pheno_1.pheno.plink -mpheno 1,2 -b 10 
 ```
-To compute heritability and genetic correlation for shared-sample phenotypes: 
+To compute genetic correlation for shared-sample phenotypes: 
 ```
-../build/RHE_reg -g 200_100 -p 200_100.pheno.pheno2 -fill -b 10
+./build/SCORE -g ./example/all -p pheno_1.pheno.plink -mpheno 1,2 -fill -b 10
 ```
 To compute genetics correlation only for shared-sample phenotypes: 
 ```
-../build/RHE_reg -g 200_100 -p 200_100.pheno_pheno2 -fill -noh2g -b 10 
+./build/SCORE -g ./example/all -p pheno_1.pheno.plink -mpheno 1,2 -fill -noh2g -b 10 
 ```
 
