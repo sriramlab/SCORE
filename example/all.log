@@ -1,0 +1,27 @@
+PLINK v1.90b3.45 64-bit (13 Jan 2017)
+Options in effect:
+  --bfile chr1
+  --make-bed
+  --merge-list bed_list.txt
+  --out all
+
+Hostname: login4
+Working directory: /u/flashscratch/flashscratch1/k/kangchen/ukbb_hess/sim_gwas_typed_sample/ukbb_typed_subsample
+Start time: Mon Sep 10 13:42:39 2018
+
+Random number seed: 1536612159
+24159 MB RAM detected; reserving 12079 MB for main workspace.
+Allocated 3821 MB successfully, after larger attempt(s) failed.
+Performing single-pass merge (8430 people, 14821 variants).
+Merged fileset written to all-merge.bed + all-merge.bim + all-merge.fam .
+14821 variants loaded from .bim file.
+8430 people (3957 males, 4473 females) loaded from .fam.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 8430 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is 0.996545.
+14821 variants and 8430 people pass filters and QC.
+Note: No phenotypes present.
+--make-bed to all.bed + all.bim + all.fam ... done.
+
+End time: Mon Sep 10 13:42:40 2018
