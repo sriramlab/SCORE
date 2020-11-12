@@ -6,21 +6,20 @@
 #include <sstream>
 #include <map>
 #include <fstream>
-#include <bits/stdc++.h>
 
 using namespace std;
 
 struct options{
-	std::string ANNOTATION_FILE_PATH; 
+	std::string ANNOTATION_FILE_PATH;
 	std::string GENOTYPE_FILE_PATH;
-	std::string PHENOTYPE_FILE_PATH; 
-	std::string PHENOTYPE_FILE_LIST;  
-	std::string COVARIATE_FILE_PATH; 
-	std::string COVARIATE_NAME; 
-	std::string PAIR_PATH; 
+	std::string PHENOTYPE_FILE_PATH;
+	std::string PHENOTYPE_FILE_LIST;
+	std::string COVARIATE_FILE_PATH;
+	std::string COVARIATE_NAME;
+	std::string PAIR_PATH;
 	std::string OUTPUT_PATH;
-	std::string  pheno_idx; 
-	int batchNum; 
+	std::string  pheno_idx;
+	int batchNum;
 	int num_of_evec ;
 	bool getaccuracy ;
 	bool debugmode;
@@ -30,23 +29,23 @@ struct options{
 	bool fast_mode;
 	bool missing;
 	bool text_version;
-	bool reg; 
-	bool gwas; 
-	bool bpheno; 
-	bool pheno_fill; 
-	bool noh2g; 
-	float tr2; 	
+	bool reg;
+	bool gwas;
+	bool bpheno;
+	bool pheno_fill;
+	bool noh2g;
+	float tr2;
 };
 /***
- * Replaced this with C++0x std::is_same function 
+ * Replaced this with C++0x std::is_same function
 template<typename T, typename U>
 struct is_same {
-    static const bool value = false; 
+    static const bool value = false;
 };
 
 template<typename T>
-struct is_same<T,T> { 
-   static const bool value = true; 
+struct is_same<T,T> {
+   static const bool value = true;
 };
 
 **/
@@ -69,7 +68,7 @@ public:
 		ostr << val;
 		return ostr.str();
 	}
-		
+
 	template <typename T>
 	static T string_to_T(std::string const &val){
 		std::istringstream istr(val);
@@ -198,12 +197,12 @@ public:
 };
 
 void parse_args(int argc, char const *argv[]){
-	
+
 	// Setting Default Values
 	command_line_opts.getaccuracy=false;
 	command_line_opts.debugmode=false;
 	command_line_opts.OUTPUT_PATH = "";
-	command_line_opts.PAIR_PATH=""; 
+	command_line_opts.PAIR_PATH="";
 	bool got_genotype_file=false;
 	command_line_opts.l=2;
 	command_line_opts.accelerated_em=0;
@@ -211,13 +210,13 @@ void parse_args(int argc, char const *argv[]){
 	command_line_opts.fast_mode=true;
 	command_line_opts.missing=false;
 	command_line_opts.text_version = false;
-	command_line_opts.reg=true; 
-	command_line_opts.gwas=false; 
-	command_line_opts.tr2=-1; 
-	command_line_opts.pheno_idx=""; 
-	command_line_opts.bpheno=false; 
+	command_line_opts.reg=true;
+	command_line_opts.gwas=false;
+	command_line_opts.tr2=-1;
+	command_line_opts.pheno_idx="";
+	command_line_opts.bpheno=false;
 	command_line_opts.pheno_fill=false;
-	command_line_opts.noh2g=false;  
+	command_line_opts.noh2g=false;
 	if(argc<3){
 		cout<<"Correct Usage is "<<argv[0]<<" -g <genotype file> -p <phenotype file> -c <covaraite file> -b <zb/10> "<<endl;
 		exit(-1);
@@ -228,26 +227,26 @@ void parse_args(int argc, char const *argv[]){
 		std::string cfg_filename = std::string(argv[2]);
 		ConfigFile cfg(cfg_filename);
 		got_genotype_file=cfg.keyExists("genotype");
-		command_line_opts.batchNum = cfg.getValueOfKey<int> ("batchNum",10); 
+		command_line_opts.batchNum = cfg.getValueOfKey<int> ("batchNum",10);
 		command_line_opts.getaccuracy=cfg.getValueOfKey<bool>("accuracy",false);
 		command_line_opts.debugmode=cfg.getValueOfKey<bool>("debug",false);
 		command_line_opts.l=cfg.getValueOfKey<int>("l",0);
 		command_line_opts.OUTPUT_PATH = cfg.getValueOfKey<string>("output_path",string(""));
 		command_line_opts.GENOTYPE_FILE_PATH = cfg.getValueOfKey<string>("genotype",string(""));
-		command_line_opts.PHENOTYPE_FILE_PATH= cfg.getValueOfKey<string>("phenotype", string("")); 
-		command_line_opts.PHENOTYPE_FILE_LIST = cfg.getValueOfKey<string>("phenotypeList", string("")); 
+		command_line_opts.PHENOTYPE_FILE_PATH= cfg.getValueOfKey<string>("phenotype", string(""));
+		command_line_opts.PHENOTYPE_FILE_LIST = cfg.getValueOfKey<string>("phenotypeList", string(""));
 		command_line_opts.COVARIATE_FILE_PATH= cfg.getValueOfKey<string>("covariate", string(""));
-		command_line_opts.COVARIATE_NAME=cfg.getValueOfKey<string>("covariateName", string(""));  
-		command_line_opts.ANNOTATION_FILE_PATH=cfg.getValueOfKey<string>("annotation", string("")); 
+		command_line_opts.COVARIATE_NAME=cfg.getValueOfKey<string>("covariateName", string(""));
+		command_line_opts.ANNOTATION_FILE_PATH=cfg.getValueOfKey<string>("annotation", string(""));
 		command_line_opts.accelerated_em = cfg.getValueOfKey<int>("accelerated_em",0);
-		command_line_opts.memory_efficient = cfg.getValueOfKey<bool>("memory_efficient",false);	
+		command_line_opts.memory_efficient = cfg.getValueOfKey<bool>("memory_efficient",false);
 		command_line_opts.fast_mode = cfg.getValueOfKey<bool>("fast_mode",true);
 		command_line_opts.reg = cfg.getValueOfKey<bool>("reg",true);
-		command_line_opts.missing = cfg.getValueOfKey<bool>("missing",false);	
-		command_line_opts.text_version = cfg.getValueOfKey<bool>("text_version",false);							
+		command_line_opts.missing = cfg.getValueOfKey<bool>("missing",false);
+		command_line_opts.text_version = cfg.getValueOfKey<bool>("text_version",false);
 	}
 	else{
-		for (int i = 1; i < argc; i++) { 
+		for (int i = 1; i < argc; i++) {
 		if (i + 1 != argc){
 			if(strcmp(argv[i],"-g")==0){
 				command_line_opts.GENOTYPE_FILE_PATH = string(argv[i+1]);
@@ -255,28 +254,28 @@ void parse_args(int argc, char const *argv[]){
 				i++;
 			}
 			else if(strcmp(argv[i], "-p")==0){
-				command_line_opts.PHENOTYPE_FILE_PATH =string(argv[i+1]); 
-				i++; 
+				command_line_opts.PHENOTYPE_FILE_PATH =string(argv[i+1]);
+				i++;
 			}
 			else if(strcmp(argv[i], "-pl")==0){
 				command_line_opts.PHENOTYPE_FILE_LIST = string(argv[i+1]);
-				i++;  
+				i++;
 			}
 			else if(strcmp(argv[i], "-annot")==0){
-				command_line_opts.ANNOTATION_FILE_PATH=string(argv[i+1]); 
-				i++; 
+				command_line_opts.ANNOTATION_FILE_PATH=string(argv[i+1]);
+				i++;
 			}
 			else if(strcmp(argv[i],"-c")==0){
 				command_line_opts.COVARIATE_FILE_PATH = string(argv[i+1]);
-				i++; 
+				i++;
 			}
 			else if(strcmp(argv[i],"-cn")==0){
                                 command_line_opts.COVARIATE_NAME = string(argv[i+1]);
                                 i++;
                         }
 			else if(strcmp(argv[i], "-gc")==0){
-				command_line_opts.PAIR_PATH=string(argv[i+1]); 
-				i++; 
+				command_line_opts.PAIR_PATH=string(argv[i+1]);
+				i++;
 			}
 			else if(strcmp(argv[i],"-o")==0){
 				command_line_opts.OUTPUT_PATH = string(argv[i+1]);
@@ -287,32 +286,32 @@ void parse_args(int argc, char const *argv[]){
 				i++;
 			}
 			else if(strcmp(argv[i],"-b")==0){
-				command_line_opts.batchNum=atoi(argv[i+1]); 
-				i++; 
+				command_line_opts.batchNum=atoi(argv[i+1]);
+				i++;
 			}
 			else if(strcmp(argv[i], "-mpheno")== 0){
-				command_line_opts.pheno_idx=string(argv[i+1]); 
-				i++; 
+				command_line_opts.pheno_idx=string(argv[i+1]);
+				i++;
 			}
 			else if(strcmp(argv[i], "-gwas")==0){
-				command_line_opts.gwas=true; 
+				command_line_opts.gwas=true;
 			}
 			else if(strcmp(argv[i], "-binary")==0){
-				command_line_opts.bpheno=true; 
+				command_line_opts.bpheno=true;
 			}
 			else if (strcmp(argv[i], "-fill")==0){
-				command_line_opts.pheno_fill=true; 
+				command_line_opts.pheno_fill=true;
 			}
 			else if (strcmp(argv[i],"-noh2g")==0){
-				command_line_opts.noh2g=true; 
-			}	
+				command_line_opts.noh2g=true;
+			}
 			else if(strcmp(argv[i],"-aem")==0){
 				command_line_opts.accelerated_em = atof(argv[i+1]);
-				i++; 
+				i++;
 			}
 			else if(strcmp(argv[i], "-tr2")==0){
                                 command_line_opts.tr2=atof(argv[i+1]);
-                        	i++; 
+                        	i++;
 			}
 			else if(strcmp(argv[i],"-v")==0)
 				command_line_opts.debugmode=true;
@@ -326,12 +325,12 @@ void parse_args(int argc, char const *argv[]){
 				command_line_opts.fast_mode=false;
 				}
 			else if(strcmp(argv[i],"-nreg")==0){
-				cout<<"set false"<<endl;  
+				cout<<"set false"<<endl;
 				command_line_opts.reg=false;
-				} 
+				}
 			else if(strcmp(argv[i],"-txt")==0)
 				command_line_opts.text_version=true;
-			
+
 			else{
 				cout<<"Not Enough or Invalid arguments"<<endl;
 				cout<<"Correct Usage is "<<argv[0]<<" -g <genotype file> -p <phenotype file> -c <covariate file> -cn <covariate name> -b <num_of_zb/10>  -v (for debugmode) -a (for getting accuracy)"<<endl;
@@ -349,16 +348,16 @@ void parse_args(int argc, char const *argv[]){
 		else if(strcmp(argv[i],"-nfm")==0)
 				command_line_opts.fast_mode=false;
 		else if(strcmp(argv[i], "-nreg")==0)
-				command_line_opts.reg=false; 
+				command_line_opts.reg=false;
 		else if(strcmp(argv[i],"-miss")==0)
 				command_line_opts.missing=true;
 		else if(strcmp(argv[i],"-txt")==0)
 				command_line_opts.text_version=true;
-			
+
 		}
 
 	}
-	
+
 	if(got_genotype_file==false){
 		cout<<"Genotype file missing"<<endl;
 		cout<<"Correct Usage is "<<argv[0]<<" -g <genotype file> -k <num_of_evec> -m <max_iterations> -v (for debugmode) -a (for getting accuracy)"<<endl;

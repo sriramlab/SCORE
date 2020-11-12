@@ -1,13 +1,12 @@
-#include <bits/stdc++.h>
 #include "genotype.h"
 #include "storage.h"
 
 using namespace std;
 
 void genotype::clear_vectors(){
-	columnsum.clear(); 
-	columnsum2.clear(); 
-	columnmeans.clear(); 
+	columnsum.clear();
+	columnsum2.clear();
+	columnmeans.clear();
 }
 void genotype::init_means(bool is_missing, int pheno_num,Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> &exist_ind, int snp_idx){
 
@@ -52,7 +51,7 @@ float genotype::get_observed_pj(const unsigned char* line){
 		if (k == ncol - 1)  {
 			lmax = Nindv%4;
 			lmax = (lmax==0)?4:lmax;
-		}	
+		}
 		for ( int l = 0 ; l < lmax; l++){
 			int j = j0 + l ;
 			int ver_seg_no = j/segment_size_ver ;
@@ -65,7 +64,7 @@ float genotype::get_observed_pj(const unsigned char* line){
 			}
 		}
 	}
-	return observed_sum*1.0/observed_ct;	
+	return observed_sum*1.0/observed_ct;
  }
 
 int simulate_geno_from_random(float p_j){
@@ -76,23 +75,23 @@ int simulate_geno_from_random(float p_j){
 	else if( rval >= dist_pj[0] && rval < (dist_pj[0]+dist_pj[1]))
 		return 1;
 	else
-		return 2; 
+		return 2;
 }
 void genotype::read_txt_naive (std::string filename,bool allow_missing){
-	
-	ifstream ifs (filename.c_str(), ios::in);                                       
-	
+
+	ifstream ifs (filename.c_str(), ios::in);
+
 	std::string line;
 	std::getline(ifs, line);
     std::istringstream iss(line);
-    if (!(iss >> Nsnp >> Nindv)) { 
-		cout<<"ERROR: Header with number of SNPs and individuals not present"<<endl; 
+    if (!(iss >> Nsnp >> Nindv)) {
+		cout<<"ERROR: Header with number of SNPs and individuals not present"<<endl;
 		exit(-1);
 	}
-	
+
 	if(allow_missing){
 		not_O_i.resize(Nsnp);
-		not_O_j.resize(Nindv);	
+		not_O_j.resize(Nindv);
 	}
 
 	int i=0;
@@ -100,13 +99,13 @@ void genotype::read_txt_naive (std::string filename,bool allow_missing){
 	vector <bool> m;
 	vector <bool> l;
 	while(std::getline(ifs,line)){
-		float p_j = get_observed_pj(line); 
+		float p_j = get_observed_pj(line);
 		int sum=0;
 		for(int j=0;j<line.size();j++){
 			int val = int(line[j]-'0');
 			if(val==9 && !allow_missing){
 				val=simulate_geno_from_random(p_j);
-			}	
+			}
 			if(val==0){
 				l.push_back(false);
 				m.push_back(false);
@@ -129,7 +128,7 @@ void genotype::read_txt_naive (std::string filename,bool allow_missing){
 			}
 			else{
 				cout<<"Invalid entry in Genotype Matrix"<<endl;
-				exit(-1);				
+				exit(-1);
 			}
 		}
 		i++;
@@ -144,14 +143,14 @@ void genotype::read_txt_naive (std::string filename,bool allow_missing){
 
 
 void genotype::read_txt_mailman (std::string filename,bool allow_missing){
-   	ifstream ifs (filename.c_str(), ios::in);                                       
-	
+   	ifstream ifs (filename.c_str(), ios::in);
+
 	// Calculating the sizes and other stuff for genotype matrix
 	std::string line;
 	std::getline(ifs, line);
     std::istringstream iss(line);
-    if (!(iss >> Nsnp >> Nindv)) { 
-		cout<<"ERROR: Header with number of SNPs and individuals not present"<<endl; 
+    if (!(iss >> Nsnp >> Nindv)) {
+		cout<<"ERROR: Header with number of SNPs and individuals not present"<<endl;
 		exit(-1);
 	}
 	segment_size_hori = ceil(log(Nindv)/log(3));
@@ -162,13 +161,13 @@ void genotype::read_txt_mailman (std::string filename,bool allow_missing){
 
 	if(allow_missing){
 		not_O_i.resize(Nsnp);
-		not_O_j.resize(Nindv);	
+		not_O_j.resize(Nindv);
 	}
 
 	int i=0;
 
 	while(std::getline(ifs,line)){
-		float p_j =get_observed_pj(line); 
+		float p_j =get_observed_pj(line);
 		int horiz_seg_no = i/segment_size_hori ;
 		int sum=0;
 		for(int j=0;j<line.size();j++){
@@ -179,7 +178,7 @@ void genotype::read_txt_mailman (std::string filename,bool allow_missing){
 			if(val==0 || val==1 || val==2){
 				sum+=val;
 				p[horiz_seg_no][j] = (3 * p[horiz_seg_no][j]) + val ;
-			}	
+			}
 			else if(val==9 && allow_missing){
 				p[horiz_seg_no][j] = 3 * p[horiz_seg_no][j] ;
 				not_O_i[i].push_back(j);
@@ -188,12 +187,12 @@ void genotype::read_txt_mailman (std::string filename,bool allow_missing){
 			else{
 				cout<<"ERROR: Invalid character in genotype file"<<endl;
 				exit(-1);
-			}			
+			}
 		}
 		i++;
 //		columnsum.push_back(sum);
 	}
-//	init_means(allow_missing);	
+//	init_means(allow_missing);
 }
 
 
@@ -228,15 +227,15 @@ void genotype::read_bim (string filename, int pheno_num){
         std::istringstream in;
 
 	for(int i=0; i<23; i++)
-		chromSNP[i]=0; 
+		chromSNP[i]=0;
 	while(std::getline (inp, line)){
 		in.clear();
                 in.str(line);
                 string temp;
-		in >> temp; 
-		int cur = atof(temp.c_str()); 
-		chromSNP[cur-1]++; 
-	
+		in >> temp;
+		int cur = atof(temp.c_str());
+		chromSNP[cur-1]++;
+
 		linenum ++;
 		char c = line[0];
 		if (c=='#')
@@ -276,7 +275,7 @@ void genotype::read_fam (string filename){
 	inp.close();
 }
 
-void genotype::set_metadata() { 
+void genotype::set_metadata() {
 	wordsize = sizeof(char) * 8;
 	unitsize = 2;
 	unitsperword = wordsize/unitsize;
@@ -288,7 +287,7 @@ void genotype::set_metadata() {
 }
 
 void genotype::read_bed_mailman (string filename ,bool allow_missing, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> &pheno_mask, int pheno_num)  {
-   	ifstream ifs (filename.c_str(), ios::in|ios::binary);                                       
+   	ifstream ifs (filename.c_str(), ios::in|ios::binary);
    	char magic[3];
 	set_metadata ();
 
@@ -300,25 +299,25 @@ void genotype::read_bed_mailman (string filename ,bool allow_missing, Eigen::Mat
 	segment_size_hori = segment_size_hori>0?segment_size_hori:1;
 	Nsegments_hori = ceil(Nsnp*1.0/(segment_size_hori*1.0));
 	p.resize(Nsegments_hori,std::vector<int>(Nindv));
-	
+
 	if(allow_missing){
  		not_O_i.resize(Nsnp);
  		not_O_j.resize(Nindv);
  	}
-	
+
 //	int sum=0;
 //	int sum2 = 0;
-	vector<int> sum(pheno_num); 
+	vector<int> sum(pheno_num);
 	vector<int> sum2(pheno_num);
 	for(int phenoi=0; phenoi<pheno_num; phenoi++)
 	{
-		sum[phenoi]=0; sum2[phenoi]=0; 
-	} 
+		sum[phenoi]=0; sum2[phenoi]=0;
+	}
 //	msb.resize(Nsnp,std::vector<bool>(Nindv));
-	//columnsum.resize(pheno_num, std::vector<int>(Nsnp)); 
+	//columnsum.resize(pheno_num, std::vector<int>(Nsnp));
 	//columnsum2.resize (pheno_num, std::vector<int>(Nsnp));
-	    
-	rowsum.resize(Nindv, std::vector<double>(23)); 
+
+	rowsum.resize(Nindv, std::vector<double>(23));
 	for(int ind =0; ind<Nindv; ind++)
 		for(int chrom =0; chrom<=22; chrom++)
 			rowsum[ind][chrom]=0;
@@ -328,18 +327,18 @@ void genotype::read_bed_mailman (string filename ,bool allow_missing, Eigen::Mat
 	vector<int> v (Nindv);
 	int y[4];
 	int snp_idx=0;
-	Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>  exist_ind = pheno_mask.colwise().sum(); 
+	Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>  exist_ind = pheno_mask.colwise().sum();
 	for (int chrom_i =0; chrom_i <=22; chrom_i++)
 	{
-		int block_snp_num = chromSNP[chrom_i]; 
+		int block_snp_num = chromSNP[chrom_i];
 	//for (int i = 0 ; i < Nsnp; i++){
 		for(int i=0; i<block_snp_num; i++){
 		int horiz_seg_no = snp_idx/segment_size_hori ;
-	   	ifs.read (reinterpret_cast<char*>(gtype), ncol*sizeof(unsigned char));   
-    		float p_j = get_observed_pj(gtype); 
+	   	ifs.read (reinterpret_cast<char*>(gtype), ncol*sizeof(unsigned char));
+    		float p_j = get_observed_pj(gtype);
 		int n=0;
 		double snp_mean=0;
-		double curSNP[Nindv];   
+		double curSNP[Nindv];
 		for (int k = 0 ;k < ncol ; k++) {
         		unsigned char c = gtype [k];
 			// Extract PLINK genotypes
@@ -353,7 +352,7 @@ void genotype::read_bed_mailman (string filename ,bool allow_missing, Eigen::Mat
 			if (k == ncol - 1)  {
 				lmax = Nindv%4;
 				lmax = (lmax==0)?4:lmax;
-			}	
+			}
 			for ( int l = 0 ; l < lmax; l++){
 				int j = j0 + l ;
 				int val = y[l];
@@ -366,46 +365,46 @@ void genotype::read_bed_mailman (string filename ,bool allow_missing, Eigen::Mat
 					not_O_i[i].push_back(j);
 					not_O_j[j].push_back(i);
 				}
-				val-- ; 
+				val-- ;
 				val =  (val < 0 ) ? 0 :val ;
-				snp_mean += val; 
+				snp_mean += val;
 				for(int phenoi=0; phenoi<pheno_num; phenoi++)
 				{
 					sum[phenoi] += val*pheno_mask(n,phenoi);
 					sum2[phenoi] += val*val*pheno_mask(n,phenoi);
 				}
 				p[horiz_seg_no][j] = 3 * p[horiz_seg_no][j]  + val;
-				curSNP[n] = val; 
-				n++; 
+				curSNP[n] = val;
+				n++;
 			}
 
     		}
 			snp_mean = snp_mean/ Nindv;
-	  
+
 			for(int t=0; t < Nindv; t++)
 			{
 				double temp = curSNP[t];
-				double q  = snp_mean/2; 
+				double q  = snp_mean/2;
 				rowsum[t][chrom_i] += (temp-snp_mean) *(temp-snp_mean) / 2/q/(1-q);
-			}	
+			}
 			for(int phenoi=0; phenoi<pheno_num; phenoi++){
 			columnsum[phenoi][snp_idx] = sum[phenoi];
 			columnsum2[phenoi][snp_idx] = sum2[phenoi];
-			sum[phenoi]=0; sum2[phenoi]=0; 
+			sum[phenoi]=0; sum2[phenoi]=0;
 			}
-			
-		
+
+
 		n=0;
-		snp_idx++; 
-		} 
+		snp_idx++;
+		}
 	}
-	init_means(false, pheno_num,exist_ind, 0);	
+	init_means(false, pheno_num,exist_ind, 0);
 	delete[] gtype;
 }
 
 void genotype::read_bed_mailman_stream(string filename, bool allow_missing, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> &pheno_mask, int pheno_num, int snp_idx, ifstream & ifs, int SNP_BLOCK_SIZE){
 //	ifstream ifs (filename.c_str(), ios::in|ios::binary);
-   	Nsnp=SNP_BLOCK_SIZE; 
+   	Nsnp=SNP_BLOCK_SIZE;
         char magic[3];
         set_metadata ();
 
@@ -415,14 +414,14 @@ void genotype::read_bed_mailman_stream(string filename, bool allow_missing, Eige
 
         segment_size_hori = floor(log(Nindv)/log(3)) - 2 ;
         segment_size_hori = segment_size_hori>0?segment_size_hori:1;
-        //Nsegments_hori = ceil(1*1.0/(segment_size_hori*1.0)); 
+        //Nsegments_hori = ceil(1*1.0/(segment_size_hori*1.0));
 	Nsegments_hori = ceil(Nsnp*1.0/(segment_size_hori*1.0));
 	p.resize(Nsegments_hori,std::vector<int>(Nindv));
 
         if(allow_missing){
 	      not_O_i.resize(Nsnp);
                 not_O_j.resize(Nindv);
-        }			
+        }
 	vector<int> sum(pheno_num);
         vector<int> sum2(pheno_num);
         for(int phenoi=0; phenoi<pheno_num; phenoi++)
@@ -434,31 +433,31 @@ void genotype::read_bed_mailman_stream(string filename, bool allow_missing, Eige
 
 	vector<int> v (Nindv);
         int y[4];
-	Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>  exist_ind = pheno_mask.colwise().sum(); 
+	Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>  exist_ind = pheno_mask.colwise().sum();
 
 
 	//initialize values
 	//
 	for(int i=0; i<SNP_BLOCK_SIZE;i++){
-	int horiz_seg_no= i/segment_size_hori; 
+	int horiz_seg_no= i/segment_size_hori;
 	for(int k=0; k<ncol; k++){
 		int j0 = k*unitsperword;
-		int lmax=4; 
+		int lmax=4;
 		if(k == ncol -1) {
-			lmax=Nindv%4; 
-			lmax= (lmax==0)?4:lmax; 
+			lmax=Nindv%4;
+			lmax= (lmax==0)?4:lmax;
 		}
 		for(int l=0; l<lmax;l++)
 		{
-			int j = j0+l; 
-			p[horiz_seg_no][j]=0; 
-		}	
-	}	
+			int j = j0+l;
+			p[horiz_seg_no][j]=0;
+		}
+	}
 	}
 	for(int i=0; i<SNP_BLOCK_SIZE; i++){
 	//if(i%50000 ==0)
-	//	std::cout<<"read in "<<i*50000<<" snps \n"; 
-	int horiz_seg_no =i/segment_size_hori; 
+	//	std::cout<<"read in "<<i*50000<<" snps \n";
+	int horiz_seg_no =i/segment_size_hori;
 	ifs.read (reinterpret_cast<char*>(gtype), ncol*sizeof(unsigned char));
 	float p_j = get_observed_pj(gtype);
 	int n=0;
@@ -467,16 +466,16 @@ void genotype::read_bed_mailman_stream(string filename, bool allow_missing, Eige
 /*
 
 	for (int k=0; k<ncol; k++){
-			int j0=k*unitsperword; 
-			int lmax=4; 
+			int j0=k*unitsperword;
+			int lmax=4;
 			if (k == ncol - 1)  {
                                 lmax = Nindv%4;
                                 lmax = (lmax==0)?4:lmax;
                         }
                         for ( int l = 0 ; l < lmax; l++){
 			int j=j0+l;
-			p[horiz_seg_no][j]=0; 
-			//std::cout<<"initial" <<p[horiz_seg_no][j] <<endl; 	
+			p[horiz_seg_no][j]=0;
+			//std::cout<<"initial" <<p[horiz_seg_no][j] <<endl;
 			}
 	}
 */
@@ -497,7 +496,7 @@ void genotype::read_bed_mailman_stream(string filename, bool allow_missing, Eige
                                 int val = y[l];
                                 if(val==1 && !allow_missing){
                                         val = simulate_geno_from_random(p_j);
-                                  	//val=0; 
+                                  	//val=0;
 				        val++;
                                         val = (val==1) ? 0 : val;
 				}
@@ -509,15 +508,15 @@ void genotype::read_bed_mailman_stream(string filename, bool allow_missing, Eige
                                 val =  (val < 0 ) ? 0 :val ;
                                 snp_mean += val;
                         	//if(i==0)
-				//	std::cout<<val<<endl; 
+				//	std::cout<<val<<endl;
 			        for(int phenoi=0; phenoi<pheno_num; phenoi++)
                                 {
                                         sum[phenoi] += val*pheno_mask(n,phenoi);
                                         sum2[phenoi] += val*val*pheno_mask(n,phenoi);
                                 }
-			//	std::cout<<"Savedin "<<horiz_seg_no <<" "<<j; 				
+			//	std::cout<<"Savedin "<<horiz_seg_no <<" "<<j;
                                 p[horiz_seg_no][j] = 3 * p[horiz_seg_no][j]  + val;
-                                //std::cout<<" "<<p[horiz_seg_no][j]<<endl; 
+                                //std::cout<<" "<<p[horiz_seg_no][j]<<endl;
 				curSNP[n] = val;
                                 n++;
                         }
@@ -529,19 +528,19 @@ void genotype::read_bed_mailman_stream(string filename, bool allow_missing, Eige
                         columnsum2[phenoi][i] = sum2[phenoi];
                         sum[phenoi]=0; sum2[phenoi]=0;
                         }
-	n=0; 
-	}	
+	n=0;
+	}
 	init_means(false, pheno_num, exist_ind, 0);
-	sum.clear(); 
-	sum2.clear(); 
-	delete[] gtype; 
+	sum.clear();
+	sum2.clear();
+	delete[] gtype;
 //initiate mean
 	//columnmeans.resize(pheno_num, std::vector<double>(1));;
-		
+
 }
 void genotype::read_bed_naive (string filename, bool allow_missing, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> &pheno_mask, int pheno_num)  {
 
-	ifstream ifs (filename.c_str(), ios::in|ios::binary);                                       
+	ifstream ifs (filename.c_str(), ios::in|ios::binary);
    	char magic[3];
 	set_metadata ();
     gtype =  new unsigned char[ncol];
@@ -552,25 +551,25 @@ void genotype::read_bed_naive (string filename, bool allow_missing, Eigen::Matri
 
 	if(allow_missing){
 		not_O_i.resize(Nsnp);
-		not_O_j.resize(Nindv);	
+		not_O_j.resize(Nindv);
 	}
-	vector<int> sum(pheno_num); 
-	vector<int> sum2(pheno_num); 
+	vector<int> sum(pheno_num);
+	vector<int> sum2(pheno_num);
 	for(int phenoi=0; phenoi<pheno_num; phenoi++)
 	{
-		sum[phenoi]=0; sum2[phenoi]=0; 
-	}	
-	columnsum.resize (pheno_num, std::vector<int>(Nsnp));    
-	columnsum2.resize(pheno_num, std::vector<int>(Nsnp)); 
+		sum[phenoi]=0; sum2[phenoi]=0;
+	}
+	columnsum.resize (pheno_num, std::vector<int>(Nsnp));
+	columnsum2.resize(pheno_num, std::vector<int>(Nsnp));
 	// Note that the coding of 0 and 2 can get flipped relative to plink because plink uses allele frequency (minor)
 	// allele to code a SNP as 0 or 1.
 	// This flipping does not matter for results.
 	vector<int> v (Nindv);
 	int y[4];
 	for (int i = 0 ; i < Nsnp; i++){
-	   	ifs.read (reinterpret_cast<char*>(gtype), ncol*sizeof(unsigned char));   
-		float p_j =get_observed_pj(gtype); 
-		int n=0; 
+	   	ifs.read (reinterpret_cast<char*>(gtype), ncol*sizeof(unsigned char));
+		float p_j =get_observed_pj(gtype);
+		int n=0;
     	for (int k = 0 ;k < ncol ; k++) {
         	unsigned char c = gtype [k];
 			// Extract PLINK genotypes
@@ -584,7 +583,7 @@ void genotype::read_bed_naive (string filename, bool allow_missing, Eigen::Matri
 			if (k == ncol - 1)  {
 				lmax = Nindv%4;
 				lmax = (lmax==0)?4:lmax;
-			}	
+			}
 			// Note  : Plink uses different values for coding genotypes
 			// Note  : Does not work for missing values
 			// To handle missing data it is recommended to write a separate function. This is easy to do.
@@ -592,7 +591,7 @@ void genotype::read_bed_naive (string filename, bool allow_missing, Eigen::Matri
 			for ( int l = 0 ; l < lmax; l++){
 				int j = j0 + l ;
 				// Extract  PLINK coded genotype and convert into 0/1/2
-				// PLINK coding: 
+				// PLINK coding:
 				// 00->0
 				// 01->missing
 				// 10->1
@@ -607,14 +606,14 @@ void genotype::read_bed_naive (string filename, bool allow_missing, Eigen::Matri
 					not_O_i[i].push_back(j);
 					not_O_j[j].push_back(i);
 				}
-				val-- ; 
+				val-- ;
 				val =  (val < 0 ) ? 0 :val ;
 				for(int phenoi=0; phenoi<pheno_num; phenoi++)
 				{
-					sum[phenoi] += val*pheno_mask(n, phenoi); 
-					sum2[phenoi] += val*val*pheno_mask(n,phenoi); 
+					sum[phenoi] += val*pheno_mask(n, phenoi);
+					sum2[phenoi] += val*val*pheno_mask(n,phenoi);
 				}
-				n++; 
+				n++;
 				if(val==0){
 					lsb[i][j] = false;
 					msb[i][j]= false;
@@ -629,7 +628,7 @@ void genotype::read_bed_naive (string filename, bool allow_missing, Eigen::Matri
 				}
 				else{
 					cout<<"Invalid entry in Genotype Matrix"<<endl;
-					exit(-1);				
+					exit(-1);
 				}
 			}
     	}
@@ -637,15 +636,15 @@ void genotype::read_bed_naive (string filename, bool allow_missing, Eigen::Matri
 	//	columnsum2[i] = sum2;
 		for(int phenoi=0; phenoi<pheno_num; phenoi++)
 		{
-			columnsum[phenoi][i] =sum[phenoi]; 
+			columnsum[phenoi][i] =sum[phenoi];
 			columnsum2[phenoi][i]=sum2[phenoi];
-			sum[phenoi]=0; sum2[phenoi]=0; 
+			sum[phenoi]=0; sum2[phenoi]=0;
 		}
-		n=0; 
+		n=0;
 	}
-//	init_means(allow_missing);	
-	Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> exist_ind = pheno_mask.colwise().sum(); 
-	init_means(false, pheno_num, exist_ind, 0); 
+//	init_means(allow_missing);
+	Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> exist_ind = pheno_mask.colwise().sum();
+	init_means(false, pheno_num, exist_ind, 0);
 
 	delete[] gtype;
 }
@@ -653,22 +652,22 @@ void genotype::read_bed_naive (string filename, bool allow_missing, Eigen::Matri
 
 void genotype::read_bed (string filename, bool allow_missing, bool mailman_mode ,Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> &pheno_mask, int pheno_num)  {
 	if(mailman_mode){
-		read_bed_mailman(filename, allow_missing, pheno_mask, pheno_num); 
+		read_bed_mailman(filename, allow_missing, pheno_mask, pheno_num);
 	}
 	else{
 		read_bed_naive(filename,allow_missing,pheno_mask, pheno_num);
 	}
 }
 
-void genotype::read_plink(std::string filenameprefix, bool allow_missing,bool mailman_mode,Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> &pheno_mask, int pheno_num)  { 
-	
-	std::stringstream f1;  
+void genotype::read_plink(std::string filenameprefix, bool allow_missing,bool mailman_mode,Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> &pheno_mask, int pheno_num)  {
+
+	std::stringstream f1;
 	f1 << filenameprefix << ".bim";
 	read_bim (f1.str(), pheno_num);
-//	std::stringstream f2;  
+//	std::stringstream f2;
 //	f2 << filenameprefix << ".fam";
 //	read_fam (f2.str());
-	std::stringstream f3;  
+	std::stringstream f3;
 	f3 << filenameprefix << ".bed";
 	read_bed (f3.str(), allow_missing,mailman_mode, pheno_mask, pheno_num);
 }
@@ -698,24 +697,24 @@ double genotype::get_col_sum(int snpindex, int phenoindex){
 
 
 double genotype::get_col_sum2(int snpindex, int phenoindex){
-	double temp=columnsum2[phenoindex][snpindex]; 
-	return temp; 
+	double temp=columnsum2[phenoindex][snpindex];
+	return temp;
 }
 double genotype::get_row_sum(int indindex, int chromindex){
-	double temp = rowsum[indindex][chromindex]; 
-	return temp; 	
+	double temp = rowsum[indindex][chromindex];
+	return temp;
 }
 double genotype::get_col_std(int snpindex,int phenoindex, int exist_ind){
 	double p_i = get_col_mean(snpindex,phenoindex);
-//	double temp = sqrt(p_i*(1-(0.5*p_i))) ; 
-	double col_sum2 = get_col_sum2(snpindex, phenoindex); 
-	double col_sum = get_col_sum(snpindex, phenoindex); 
-	double temp = sqrt((col_sum2 + exist_ind*p_i*p_i - 2*col_sum*p_i)/(exist_ind-1)); 
+//	double temp = sqrt(p_i*(1-(0.5*p_i))) ;
+	double col_sum2 = get_col_sum2(snpindex, phenoindex);
+	double col_sum = get_col_sum(snpindex, phenoindex);
+	double temp = sqrt((col_sum2 + exist_ind*p_i*p_i - 2*col_sum*p_i)/(exist_ind-1));
 	return temp;
 }
 
 int genotype::get_chrom_snp(int chromindex){
-	return chromSNP[chromindex];  
+	return chromSNP[chromindex];
 }
 void genotype::generate_eigen_geno(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> &geno_matrix,bool var_normalize,int phenoindex){
 	for(int i=0;i<Nsnp;i++){
@@ -724,7 +723,7 @@ void genotype::generate_eigen_geno(Eigen::Matrix<double, Eigen::Dynamic, Eigen::
 			double l = lsb[i][j];
 			double geno = (m*2.0+l);
 			if(var_normalize){
-				geno =geno - get_col_mean(i, phenoindex); 
+				geno =geno - get_col_mean(i, phenoindex);
 				geno_matrix(i,j) = geno/get_col_std(i, phenoindex,Nindv);
 			}
 			else
@@ -764,7 +763,7 @@ void genotype::read_genotype_eff (std::string filename,bool allow_missing){
 	int sum=0;
 	if(allow_missing){
 		not_O_i.resize(Nsnp);
-		not_O_j.resize(Nindv);	
+		not_O_j.resize(Nindv);
 	}
 
     do{
@@ -801,7 +800,7 @@ void genotype::read_genotype_eff (std::string filename,bool allow_missing){
 				add_to_arr(temp,j,Nbits_hori,p_eff[horiz_seg_no]);
 				add_to_arr(3*extract_from_arr(i,Nbits_ver,q_eff[ver_seg_no]),i,Nbits_ver,q_eff[ver_seg_no]);
 				not_O_i[i].push_back(j);
-				not_O_j[j].push_back(i);				
+				not_O_j[j].push_back(i);
 			}
 			else{
 				cout<<"Invalid entry in Genotype Matrix"<<endl;
@@ -812,6 +811,6 @@ void genotype::read_genotype_eff (std::string filename,bool allow_missing){
 		}
 	}while(!feof(fp));
 	i--;
-	init_means(allow_missing);	
+	init_means(allow_missing);
 }
 */
