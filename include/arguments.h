@@ -204,6 +204,9 @@ void parse_args(int argc, char const *argv[]){
 	command_line_opts.OUTPUT_PATH = "";
 	command_line_opts.PAIR_PATH="";
 	bool got_genotype_file=false;
+	bool got_phenotype_file=false;
+	bool got_mpheno_arg=false;
+	bool got_batch_arg=false;
 	command_line_opts.l=2;
 	command_line_opts.accelerated_em=0;
 	command_line_opts.memory_efficient=false;
@@ -247,6 +250,7 @@ void parse_args(int argc, char const *argv[]){
 	}
 	else{
 		for (int i = 1; i < argc; i++) {
+		// The minimum required args:
 		if (i + 1 != argc){
 			if(strcmp(argv[i],"-g")==0){
 				command_line_opts.GENOTYPE_FILE_PATH = string(argv[i+1]);
@@ -255,6 +259,7 @@ void parse_args(int argc, char const *argv[]){
 			}
 			else if(strcmp(argv[i], "-p")==0){
 				command_line_opts.PHENOTYPE_FILE_PATH =string(argv[i+1]);
+				got_phenotype_file=true;
 				i++;
 			}
 			else if(strcmp(argv[i], "-pl")==0){
@@ -287,11 +292,13 @@ void parse_args(int argc, char const *argv[]){
 			}
 			else if(strcmp(argv[i],"-b")==0){
 				command_line_opts.batchNum=atoi(argv[i+1]);
+				got_batch_arg=true;
 				i++;
 			}
 			else if(strcmp(argv[i], "-mpheno")== 0){
 				command_line_opts.pheno_idx=string(argv[i+1]);
 				i++;
+				got_mpheno_arg=true;
 			}
 			else if(strcmp(argv[i], "-gwas")==0){
 				command_line_opts.gwas=true;
@@ -354,6 +361,16 @@ void parse_args(int argc, char const *argv[]){
 		else if(strcmp(argv[i],"-txt")==0)
 				command_line_opts.text_version=true;
 
+		}
+
+		if((got_genotype_file
+			&got_genotype_file
+			&got_mpheno_arg
+			&got_batch_arg)==false
+		){
+			cout<<"Not Enough or Invalid arguments"<<endl;
+			cout<<"Correct Usage is "<<argv[0]<<" -g <genotype file> -p <phenotype file> -c <covariate file> -cn <covariate name> -b <num_of_zb/10>  -v (for debugmode) -a (for getting accuracy)"<<endl;
+			exit(-1);
 		}
 
 	}
