@@ -6,9 +6,7 @@
 #include <sstream>
 #include <map>
 #include <fstream>
-#include <experimental/filesystem>
 
-namespace fs = std::__fs::filesystem;
 using namespace std;
 
 struct options{
@@ -53,8 +51,16 @@ struct is_same<T,T> {
 **/
 extern options command_line_opts;
 
+fstream fileCheck;
 inline bool fileExists (const std::string& name) {
-    return fs::exists(name);
+	fileCheck.open(name);
+	if (fileCheck.fail()) {
+		return false;
+	}
+	else {
+		fileCheck.close();
+		return true;
+	}
 }
 
 void exitWithError(const std::string &error) {
