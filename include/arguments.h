@@ -6,7 +6,9 @@
 #include <sstream>
 #include <map>
 #include <fstream>
+#include <filesystem>
 
+namespace fs = std::__fs::filesystem;
 using namespace std;
 
 struct options{
@@ -51,6 +53,9 @@ struct is_same<T,T> {
 **/
 extern options command_line_opts;
 
+inline bool fileExists (const std::string& name) {
+    return fs::exists(name);
+}
 
 void exitWithError(const std::string &error) {
 	std::cout << error;
@@ -254,11 +259,28 @@ void parse_args(int argc, char const *argv[]){
 		if (i + 1 != argc){
 			if(strcmp(argv[i],"-g")==0){
 				command_line_opts.GENOTYPE_FILE_PATH = string(argv[i+1]);
+
+				string checkExt[3] = { ".fam", ".bim", ".bed" };
+				for (int ii = 0; ii < 3; ii++) {
+					const string fileName = string(argv[i+1])+checkExt[ii];
+					if (!fileExists(fileName)) {
+						cout << "File " << fileName << " was not found." << endl;
+						exit(-1);
+					}
+				}
+
 				got_genotype_file=true;
 				i++;
 			}
 			else if(strcmp(argv[i], "-p")==0){
 				command_line_opts.PHENOTYPE_FILE_PATH =string(argv[i+1]);
+
+				const string fileName = string(argv[i+1]);
+				if (!fileExists(fileName)) {
+					cout << "File " << fileName << " was not found." << endl;
+					exit(-1);
+				}
+
 				got_phenotype_file=true;
 				i++;
 			}

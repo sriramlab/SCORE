@@ -1632,7 +1632,7 @@ int main(int argc, char const *argv[]){
 	{
 		rhe_reg(zb, Xzb_total,resid_total, i, exist_ind(0, i), cov_num, cat_num, snp_idx, Xzb_jackknife, resid_jackknife, block_idx);
 		if(pheno_fill)
-			exit;
+			exit(-1);
 	}
 	}
 	block_idx++;
