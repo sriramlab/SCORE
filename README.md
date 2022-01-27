@@ -8,8 +8,11 @@ We propose a scalable randomized Method-of-Moments (MoM) estimator of genetic co
 
 If you find that this software is useful for your research project, 
 please cite our paper: 
-
-Wu, Y., Yaschenko, A., Heydary, M. H., & Sankararaman, S. (2019). Fast estimation of genetic correlation for Biobank-scale data. bioRxiv, 525055. 
+Yue Wu, Kathryn S. Burch, Andrea Ganna, Päivi ajukanta, Bogdan Pasaniuc, Sriram Sankararaman,
+Fast estimation of genetic correlation for biobank-scale data,
+The American Journal of Human Genetics,
+Volume 109, Issue 1,
+2022
 ## Getting Started
 
 ### Prerequisites
@@ -23,7 +26,7 @@ make
 ### Installing
 Installing SCORE is fairly simple. Follow the following steps: 
 ```
-git clone https://github.com/ariel-wu/SCORE.git
+git clone https://github.com/sriramlab/SCORE.git
 cd SCORE
 mkdir build 
 cd build
@@ -31,12 +34,13 @@ cmake ..
 make
 ```
 
-## Documentation for RHE_reg
+## Documentation for SCORE
 
 After compiling the executble SCORE is present in the build directory. 
-To run RHE_reg, use
+To run SCORE, use
 
 *``./SCORE <command_line arguments> ``
+
 
 ### Parameters
 
@@ -44,7 +48,8 @@ The values in the brackets are the command line flags for running the code witho
 
 ```
 * genotype (-g) : The path of the genotype file or plink binary file prefix.
-* phenotype (-p) : The path of the phenotype file. 
+* phenotype (-p) : The path of the phenotype file.
+* output (-o): The desitnation of formatted output. (Default: output)  
 * covariate (-c) : The path of the covariate file.
 * batch number (-b) : Number of random vectors used in the estimator % 10. 
 * phenotype number (-mpheno) : The name of the pair of phenotypes to use in the phenotype file, seperated by comma. (eg. bmi,height)
@@ -69,4 +74,19 @@ To compute genetics correlation only for shared-sample phenotypes:
 ```
 ./build/SCORE -g ./example/all -p pheno_1.pheno.plink -mpheno 1,2 -fill -noh2g -b 10 
 ```
-
+### Format of output
+The output for the example provided is: 
+```
+Source  Value
+Vg(0)   0.736654
+Vg/Vp(0)        0.732530
+SE(Vg/Vp)(0)    0.083919
+Vg(1)   0.154661
+Vg/Vp(1)        0.154493
+SE(Vg/Vp)(1)    0.019508
+rho_g(0,1)      0.030006
+gamma_g(0,1)    0.088896
+SE(gamma_g)(0,1)        0.101331
+```
+Vg(i), Vg/Vp(i), and SE(Vg/Vp(0)) are the estimations of genetic variance component, heritability, and standard error for trait i. 
+rho_g(i,j), gamma_g(i,j) and SE(gamma_g)(i,j) are genetic covariance, genetic correlation, and the standard error of genetic correlation for trait i and j. 

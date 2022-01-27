@@ -1,7 +1,7 @@
 /** 
  Mailman algorithm is written by Aman Agrawal 
  (Indian Institute of Technology, Delhi)
- RHE_reg is written by Yue Ariel Wu
+ RHE_reg, SCORE is written by Yue Ariel Wu
  (UCLA)
 */
 #include <fstream>
@@ -56,7 +56,6 @@ double **y_m;
 //for partition
 double **y_e2; 
 double **yint_e2; 
-MatrixXdr yint_e2_eigen; 
 struct timespec t0;
 
 //clock_t total_begin = clock();
@@ -108,7 +107,7 @@ bool text_version = false;
 bool use_cov=false;
 bool compute_gc=false;  
 bool reg = true;
-bool gwas=false;
+//bool gwas=false;
 bool bpheno=false;   
 bool pheno_fill=false;  // if pheno_fill, estimate tr[k2] once and use for all phenotypes 
 bool noh2g=false;
@@ -1242,7 +1241,7 @@ pair<double,double> get_error_norm(MatrixXdr &c, int exist_ind, int phenoindex){
     }
 }
 
-void construct_linear_system(MatrixXdr &cur_pheno_Xzb1, MatrixXdr &cur_pheno_Xzb2, MatrixXdr &cur_pheno_resid1 ,MatrixXdr &cur_pheno_resid2,  MatrixXdr &A, MatrixXdr &b, MatrixXdr &zb, MatrixXdr &FunCat_snpcount, int cat_num, int i,int j, int SNP_max, MatrixXdr &pheno_mask1, MatrixXdr &pheno_mask2){
+void construct_linear_system(MatrixXdr &cur_pheno_Xzb1, MatrixXdr &cur_pheno_Xzb2, MatrixXdr &cur_pheno_resid1 ,MatrixXdr &cur_pheno_resid2,  MatrixXdr &A, MatrixXdr &b, MatrixXdr &zb, MatrixXdr &FunCat_snpcount, int cat_num, int i,int j, int SNP_max, MatrixXdr &pheno_mask1, MatrixXdr &pheno_mask2, MatrixXdr &FunCat){
 	
 	
 	MatrixXdr common_mask = pheno_mask1.cwiseProduct(pheno_mask2);
@@ -1308,13 +1307,19 @@ int main(int argc, char const *argv[]){
 	reg = command_line_opts.reg;
 	noh2g = command_line_opts.noh2g;
 	//gwas=false; 
-	gwas=command_line_opts.gwas; 
-	cout<<"perform GWAS: "<<gwas<<endl; 
+	//gwas=command_line_opts.gwas; 
+	//cout<<"perform GWAS: "<<gwas<<endl; 
 	bpheno = command_line_opts.bpheno; 
 	cout<<"Binary phenotype: "<<bpheno<<endl;
 	pheno_fill = command_line_opts.pheno_fill; 
 	cout<<"Filling phenotype with mean: " <<pheno_fill <<endl;  
 	cout<<"Compute heritability: "<<!noh2g<<endl; 
+
+	cout<<command_line_opts.OUTPUT_PATH; 
+	std::string output_file = command_line_opts.OUTPUT_PATH;
+	FILE *fp_output; 
+	fp_output = fopen(output_file.c_str(), "w") ;  
+	fprintf(fp_output, "%s\t%s\n","Source","Value") ; 
 	//get number of individuals
 	std::stringstream f2;
         f2 << command_line_opts.GENOTYPE_FILE_PATH << ".fam";
@@ -1405,8 +1410,9 @@ int main(int argc, char const *argv[]){
 	p = g.Nsnp;
 	n = g.Nindv;
 	bool toStop=false;
-		toStop=true;
-	srand((unsigned int) time(0));
+		toStop=true;	
+	srand(1); 	
+//	srand((unsigned int) time(0));
 	c.resize(p,k);
 	x.resize(k,n);
 	v.resize(p,k);
@@ -1497,7 +1503,8 @@ int main(int argc, char const *argv[]){
                 else if(covfile=="")
                         cout<<"No Covariate File Specified"<<endl;
 
-
+		//unused function
+		/*
 		std::string gcfile = command_line_opts.PAIR_PATH;
 		int gc_pairs=0;  
 		if(gcfile!=""){
@@ -1506,6 +1513,7 @@ int main(int argc, char const *argv[]){
 		}
 		if(pheno_num<2)
 			compute_gc=false; //can not compute genetic correlation if there is only one phenotype 
+		*/
 	vector<double> ve_result; 
 	vector<double> vg_result; 
 	vector<double> vg_se; 
@@ -1520,7 +1528,6 @@ int main(int argc, char const *argv[]){
         if(use_cov)
         {
                         WW = covariate.transpose() * covariate;
-                        cout<<WW.block(0,0,2,2)<<endl; 
 			WW = WW.inverse();
 			cout<<"WW inversed.."<<endl; 
                         pheno_prime= covariate.transpose()* pheno;
@@ -1540,19 +1547,15 @@ int main(int argc, char const *argv[]){
         cout<<"initialized Xzb_total.."<<endl; 
 	MatrixXdr resid_total= MatrixXdr::Constant(g.Nindv, cat_num*pheno_num*10, 0);
 	MatrixXdr Xzb_jackknife = MatrixXdr::Constant(g.Nindv, pheno_num*total_num_blocks*10, 0);
-	//MatrixXdr Xzb_jackknife = MatrixXdr::Constant(g.Nindv, pheno_num*22*5*10, 0); 
-	//first 1100 blocks are for phenotype 1 
 
 	 MatrixXdr resid_jackknife = MatrixXdr::Constant(g.Nindv, pheno_num * total_num_blocks*10, 0);	
-	//MatrixXdr resid_jackknife = MatrixXdr::Constant(g.Nindv, pheno_num * 22 * 5*10, 0); 
 
-	//use for wpi for SE 
- 
+	//fix seed for debug
+	if (debug) 
+		srand(1);  
 	cout<<"initialized resid_total...."<<endl; 
 	MatrixXdr zb= MatrixXdr::Random(g.Nindv, 10);
         zb = zb * sqrt(3);
-	//MatrixXdr zb = MatrixXdr::Constant(g.Nindv, 10, 0); 
-	//zb.block(0,0,10, 10) = MatrixXdr::Constant(10,10,1); 
 	cout<<"initialized zb .. "<<endl; 
 	 if(use_cov)
         {
@@ -1567,7 +1570,6 @@ int main(int argc, char const *argv[]){
 	for(int chrom_i=0; chrom_i<22; chrom_i++){
 	SNP_BLOCK_SIZE = g.get_chrom_snp(chrom_i); 
 	cout<<"reading chromosome "<<chrom_i<<endl; 
-//        int block_len = SNP_BLOCK_SIZE /5;
 	//fix block_len
 	int block_len = 4130; 
 	int block_num = ceil(((float)SNP_BLOCK_SIZE)/4130); 
@@ -1579,7 +1581,6 @@ int main(int argc, char const *argv[]){
 		if(block_iter * block_len + block_len > SNP_BLOCK_SIZE) 
 			cur_len = SNP_BLOCK_SIZE - block_iter*block_len; 
 	
-	//	cout<<"block size: "<<cur_len<<endl; 
 	g.read_bed_mailman_stream(bedfile.str(), missing, pheno_mask2, pheno_num, snp_idx, ifs, cur_len);
 
         vsegsize=g.segment_size_ver;
@@ -1627,7 +1628,7 @@ int main(int argc, char const *argv[]){
 			//yKy Xy only compute once 
 	compute_b1( use_cov,  y_sum, exist_ind(0,0), pheno_prime, pheno_fill, pheno_num, snp_idx);
 			//comptue tr[k]
-///notice this opiton is only for genome wide	
+	//notice this opiton is only for genome wide	
 	if(!noh2g){
 	for(int i=0; i<pheno_num; i++) 
 	{
@@ -1636,6 +1637,7 @@ int main(int argc, char const *argv[]){
 			exit;
 	}
 	}
+ 
 	block_idx++;
 	snp_idx += cur_len;  
 	 delete[] sum_op;
@@ -1721,17 +1723,21 @@ int main(int argc, char const *argv[]){
 			{
 				cur_pheno_Xzb.block(0, fix_rhe, g.Nindv, 1) = cur_pheno_Xzb.block(0, fix_rhe, g.Nindv, 1).cwiseProduct(cur_mask); 
 			}
-			construct_linear_system(cur_pheno_Xzb,cur_pheno_Xzb,  cur_pheno_resid,cur_pheno_resid, A, b, zb, FunCat_snpcount, cat_num, i, i,SNP_max, cur_mask,cur_mask); 
+			construct_linear_system(cur_pheno_Xzb,cur_pheno_Xzb,  cur_pheno_resid,cur_pheno_resid, A, b, zb, FunCat_snpcount, cat_num, i, i,SNP_max, cur_mask,cur_mask, FunCat); 
 			b(cat_num,0) = yy(i,i); 
 			cout<<"A: "<<endl<<A<<endl; 
 			cout<<"b: "<<endl<<b<<endl; 
 			MatrixXdr herit = A.colPivHouseholderQr().solve(b);
-                	cout<<"V(G): "<<herit.block(0,0,cat_num, 1)<<endl;
-               	 	ve = herit(cat_num,0);
+                	//cout<<"V(G): "<<herit.block(0,0,cat_num, 1)<<endl;
+               		string pheno_idx = "Vg(" + to_string(i)+")";  
+			fprintf(fp_output, "%s\t%f\n", pheno_idx.c_str(), herit(0,0)); 
+			ve = herit(cat_num,0);
                 	ve_result.push_back(ve);
-                	cout<<"V(e): "<<herit(cat_num,0)<<endl;
-                	cout<<"Vp "<<herit.sum()<<endl;
-                	cout<<"V(G)/Vp: "<<herit.block(0,0, cat_num, 1).sum()/herit.sum()<<endl;
+                	//cout<<"V(e): "<<herit(cat_num,0)<<endl;
+                	//cout<<"Vp "<<herit.sum()<<endl;
+                	//cout<<"V(G)/Vp: "<<herit.block(0,0, cat_num, 1).sum()/herit.sum()<<endl;
+			pheno_idx = "Vg/Vp("+to_string(i)+")"; 
+			fprintf(fp_output, "%s\t%f\n", pheno_idx.c_str(),  herit(0,0)/herit.sum()); 
 			h2g_estimates.block(0, i*cat_num, 1,cat_num) = herit.block(0,0,cat_num, 1).transpose();
 		//----------jackknife SE --------
 			
@@ -1755,12 +1761,15 @@ int main(int argc, char const *argv[]){
 			A  =MatrixXdr::Constant(cat_num+1, cat_num+1, g.Nindv);
         		A.block(0,0,cat_num, cat_num) = MatrixXdr::Constant(cat_num,cat_num, 0);
 			cur_pheno_Xzb = Xzb_jackknife.block(0,i*total_num_blocks*10+ block_idx*10 , g.Nindv, 10); 
-			cur_pheno_resid = resid_jackknife.block(0, block_idx*10, g.Nindv, 10); 
-			construct_linear_system(cur_pheno_Xzb, cur_pheno_Xzb, cur_pheno_resid, cur_pheno_resid, A, b, zb ,FunCat_snpcount, 1, i,i , SNP_max, cur_mask, cur_mask); 
-			A(0,0) = A(0,0) * SNP_max * SNP_max / (SNP_max  - len) / (SNP_max - len); 
-			MatrixXdr Xy_cur = Xy.block(snp_start, i , len, 1); 
-			b(0,0 ) = b(0,0) * SNP_max - (Xy_cur.transpose()*Xy_cur).sum();  
-			b(0,0) = b(0,0 ) / (SNP_max - len); 
+			cur_pheno_resid = resid_jackknife.block(0, i*total_num_blocks*10+block_idx*10, g.Nindv, 10); 
+			MatrixXdr temp_cat_mask = FunCat; 
+			temp_cat_mask.block(0, snp_start, cat_num, len) = MatrixXdr::Constant(cat_num, len, 0);
+			MatrixXdr temp_FunCat_snpcount = temp_cat_mask.rowwise().sum(); 
+			construct_linear_system(cur_pheno_Xzb, cur_pheno_Xzb, cur_pheno_resid, cur_pheno_resid, A, b, zb ,temp_FunCat_snpcount, 1, i,i , SNP_max, cur_mask, cur_mask, temp_cat_mask); 
+//			A(0,0) = A(0,0) * SNP_max * SNP_max / (SNP_max  - len) / (SNP_max - len); 
+//			MatrixXdr Xy_cur = Xy.block(snp_start, i , len, 1); 
+//			b(0,0 ) = b(0,0) * SNP_max - (Xy_cur.transpose()*Xy_cur).sum();  
+//			b(0,0) = b(0,0 ) / (SNP_max - len); 
 			MatrixXdr herit_cur = A.colPivHouseholderQr().solve(b); 
 			jackknife_h2g[block_idx] = herit_cur(0,0); 
 			//jackknife_h2g[chrom_i *5 + t] = herit_cur(0,0) / herit_cur.sum(); 
@@ -1773,8 +1782,9 @@ int main(int argc, char const *argv[]){
 			}
 			pair<double, double> jack_output; 
 			jack_output = weightedjack(jackknife_h2g, jack_weight, estimate); 
-			cout<< "SE: "<< jack_output.second<<endl; 
-			
+			pheno_idx = "SE(Vg/Vp)("+to_string(i)+")"; 
+			//cout<< "SE: "<< jack_output.second<<endl; 
+			fprintf(fp_output, "%s\t%f\n",pheno_idx.c_str(),  jack_output.second); 	
 			
 
 
@@ -1832,20 +1842,24 @@ int main(int argc, char const *argv[]){
 			double N_cur = cur_mask1.cwiseProduct(cur_mask2).sum(); 
 			cout<<"total comman samples: "<<N_cur<<endl; 
 			A.block(0,0,cat_num+1, cat_num+1) =  MatrixXdr::Constant(cat_num+1,cat_num+1, N_cur);
-			construct_linear_system(cur_pheno_Xzb1,cur_pheno_Xzb1,  cur_pheno_resid1,cur_pheno_resid2, A, b, zb, FunCat_snpcount, cat_num, j,k,SNP_max, cur_mask1, cur_mask2);
+			
+			construct_linear_system(cur_pheno_Xzb1,cur_pheno_Xzb1,  cur_pheno_resid1,cur_pheno_resid2, A, b, zb, FunCat_snpcount, cat_num, j,k,SNP_max, cur_mask1, cur_mask2, FunCat);
 		b(cat_num,0) = yy(j,k);
                         cout<<"A: "<<endl<<A<<endl;
                         cout<<"b: "<<endl<<b<<endl;
                         MatrixXdr herit = A.colPivHouseholderQr().solve(b);
-		        cout <<"rho_g: "<<herit.block(0, 0,cat_num, 1)<<endl;
-                        cout <<"rho_e: "<<herit(cat_num,0)<<endl;
-			for (int partition_i=0; partition_i<cat_num; partition_i++) 
-			{
-				cout<<"gamma_g("<<partition_i<<"):"<<herit(partition_i, 0) / sqrt(h2g_estimates(0, k*cat_num+partition_i)) / sqrt(h2g_estimates(0, j*cat_num+partition_i))<<endl ;  
+		        //cout <<"rho_g: "<<herit.block(0, 0,cat_num, 1)<<endl;
+                        //cout <<"rho_e: "<<herit(cat_num,0)<<endl;
+			//for (int partition_i=0; partition_i<cat_num; partition_i++) 
+			//{
+			//	cout<<"gamma_g("<<partition_i<<"):"<<herit(partition_i, 0) / sqrt(h2g_estimates(0, k*cat_num+partition_i)) / sqrt(h2g_estimates(0, j*cat_num+partition_i))<<endl ;  
 
-			}
-//			cout <<"gamma_g: "<<herit.block(0,0, cat_num, 1) / sqrt(h2g_estimates(0,j))/sqrt(h2g_estimates(0, k))<<endl ; 
-
+			//}
+			string pheno_idx = "rho_g("+to_string(j)+','+to_string(k)+")"; 
+			fprintf(fp_output, "%s\t%f\n", pheno_idx.c_str(),  herit(0,0)); 
+			//fprintf(fp_output, "%s\t%s\t%f\n", pheno_idx, "gamma_g", 
+			pheno_idx = "gamma_g(" + to_string(j)+","+ to_string(k)+")"; 
+			fprintf(fp_output, "%s\t%f\n", pheno_idx.c_str(), herit(0,0)/sqrt(h2g_estimates(0, k))/sqrt(h2g_estimates(0,j))); 
 			//----for jackknife SE -----
 					
 			double rg_estimate = herit(0,0) / sqrt(h2g_estimates(0,j))/sqrt(h2g_estimates(0, k));
@@ -1870,23 +1884,34 @@ int main(int argc, char const *argv[]){
                         cur_pheno_Xzb2 = Xzb_jackknife.block(0, k*total_num_blocks*10+block_idx*10, g.Nindv, 10);
 			cur_pheno_resid1 = resid_jackknife.block(0, j*total_num_blocks*10+block_idx*10, g.Nindv, 10);
 			cur_pheno_resid2 = resid_jackknife.block(0, k*total_num_blocks*10+block_idx*10, g.Nindv, 10);
-                        construct_linear_system(cur_pheno_Xzb1, cur_pheno_Xzb2, cur_pheno_resid1, cur_pheno_resid2, A, b, zb ,FunCat_snpcount, 1, j,k , SNP_max, cur_mask1, cur_mask2);
-                        A(0,0) = A(0,0) * SNP_max * SNP_max / (SNP_max  - len) / (SNP_max - len);
-                        MatrixXdr Xy_cur1 = Xy.block(snp_start, j , len, 1);
-                        MatrixXdr Xy_cur2 = Xy.block(snp_start, k , len, 1);
-			b(0,0 ) = b(0,0) * SNP_max - (Xy_cur1.transpose()*Xy_cur2).sum();
-                        b(0,0) = b(0,0 ) / (SNP_max - len);
-                        MatrixXdr herit_cur = A.colPivHouseholderQr().solve(b);
-                        jackknife_rg[block_idx] = herit_cur(0,0);
+                         MatrixXdr temp_cat_mask = FunCat;
+                	temp_cat_mask.block(0, snp_start, cat_num, len) = MatrixXdr::Constant(cat_num, len, 0);
+                	MatrixXdr temp_FunCat_snpcount = temp_cat_mask.rowwise().sum();
+			construct_linear_system(cur_pheno_Xzb1, cur_pheno_Xzb2, cur_pheno_resid1, cur_pheno_resid2, A, b, zb ,temp_FunCat_snpcount, 1, j,k , SNP_max, cur_mask1, cur_mask2, temp_cat_mask);
+//                        A(0,0) = A(0,0) * SNP_max * SNP_max / (SNP_max  - len) / (SNP_max - len);
+    //                    MatrixXdr Xy_cur1 = Xy.block(snp_start, j , len, 1);
+      //                  MatrixXdr Xy_cur2 = Xy.block(snp_start, k , len, 1);
+//			b(0,0 ) = b(0,0) * SNP_max - (Xy_cur1.transpose()*Xy_cur2).sum();
+  //                      b(0,0) = b(0,0 ) / (SNP_max - len);
+                        b(cat_num, 0 ) = yy(j,k) ; 
+			MatrixXdr herit_cur = A.colPivHouseholderQr().solve(b);
+			jackknife_rg[block_idx] = herit_cur(0,0);
 			jackknife_rg[block_idx] = jackknife_rg[block_idx] / sqrt(h2g_estimates(block_idx+1, j))/ sqrt(h2g_estimates(block_idx+1, k)); 
 			jack_weight[block_idx] = SNP_max - len; 
+			
+//			if (block_idx==0)
+//				cout<<Xzb_total.block(0,0,4,4)<<endl<<A<<endl<<b<<endl<<(SNP_max-len)<<endl<< Xzb_jackknife.block(0, 0, 4, 4)<<endl; 
+				
+
 			block_idx++; 
 			snp_start += len; 
 			}
 			}
 			 pair<double, double> jack_output;
                         jack_output = weightedjack(jackknife_rg, jack_weight, rg_estimate);
-                        cout<< "SE(gamma_g): "<< jack_output.second<<endl;
+                        pheno_idx =  "SE(gamma_g)(" + to_string(j)+","+ to_string(k)+")";
+			fprintf(fp_output, "%s\t%f\n" , pheno_idx.c_str(), jack_output.second); 
+			//cout<< "SE(gamma_g): "<< jack_output.second<<endl;
 			
 			
 			}
