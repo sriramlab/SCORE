@@ -15,4 +15,4 @@ IF (NOT DEFINED DEBUG)
 ENDIF()
 ADD_DEFINITIONS(-DDEBUG=${DEBUG})
 
-add_executable(SCORE  src/score.cpp src/genotype.cpp src/storage.cpp)
+add_executable(SCORE  src/score_stream.cpp src/genotype.cpp src/storage.cpp)

@@ -31,11 +31,11 @@ struct options{
 	bool missing;
 	bool text_version;
 	bool reg; 
-	bool gwas; 
 	bool bpheno; 
 	bool pheno_fill; 
 	bool noh2g; 
 	float tr2; 	
+	int window_size; //window size; num of snps in every window 
 };
 /***
  * Replaced this with C++0x std::is_same function 
@@ -202,7 +202,7 @@ void parse_args(int argc, char const *argv[]){
 	// Setting Default Values
 	command_line_opts.getaccuracy=false;
 	command_line_opts.debugmode=false;
-	command_line_opts.OUTPUT_PATH = "";
+	command_line_opts.OUTPUT_PATH = "output";
 	command_line_opts.PAIR_PATH=""; 
 	bool got_genotype_file=false;
 	command_line_opts.l=2;
@@ -212,14 +212,14 @@ void parse_args(int argc, char const *argv[]){
 	command_line_opts.missing=false;
 	command_line_opts.text_version = false;
 	command_line_opts.reg=true; 
-	command_line_opts.gwas=false; 
 	command_line_opts.tr2=-1; 
 	command_line_opts.pheno_idx=""; 
 	command_line_opts.bpheno=false; 
 	command_line_opts.pheno_fill=false;
 	command_line_opts.noh2g=false;  
+	command_line_opts.window_size= 4130; 
 	if(argc<3){
-		cout<<"Correct Usage is "<<argv[0]<<" -g <genotype file> -p <phenotype file> -c <covaraite file> -b <zb/10> "<<endl;
+		cout<<"Correct Usage is "<<argv[0]<<" -g <genotype file> -p <phenotype file> -c <covaraite file> -b <zb> "<<endl;
 		exit(-1);
 	}
 
@@ -232,7 +232,7 @@ void parse_args(int argc, char const *argv[]){
 		command_line_opts.getaccuracy=cfg.getValueOfKey<bool>("accuracy",false);
 		command_line_opts.debugmode=cfg.getValueOfKey<bool>("debug",false);
 		command_line_opts.l=cfg.getValueOfKey<int>("l",0);
-		command_line_opts.OUTPUT_PATH = cfg.getValueOfKey<string>("output_path",string(""));
+		command_line_opts.OUTPUT_PATH = cfg.getValueOfKey<string>("output_path",string("output"));
 		command_line_opts.GENOTYPE_FILE_PATH = cfg.getValueOfKey<string>("genotype",string(""));
 		command_line_opts.PHENOTYPE_FILE_PATH= cfg.getValueOfKey<string>("phenotype", string("")); 
 		command_line_opts.PHENOTYPE_FILE_LIST = cfg.getValueOfKey<string>("phenotypeList", string("")); 
@@ -290,12 +290,13 @@ void parse_args(int argc, char const *argv[]){
 				command_line_opts.batchNum=atoi(argv[i+1]); 
 				i++; 
 			}
+			else if (strcmp(argv[i], "-window")==0){
+				command_line_opts.window_size = atoi(argv[i+1]); 
+				i++; 
+			}
 			else if(strcmp(argv[i], "-mpheno")== 0){
 				command_line_opts.pheno_idx=string(argv[i+1]); 
 				i++; 
-			}
-			else if(strcmp(argv[i], "-gwas")==0){
-				command_line_opts.gwas=true; 
 			}
 			else if(strcmp(argv[i], "-binary")==0){
 				command_line_opts.bpheno=true; 
@@ -334,7 +335,7 @@ void parse_args(int argc, char const *argv[]){
 			
 			else{
 				cout<<"Not Enough or Invalid arguments"<<endl;
-				cout<<"Correct Usage is "<<argv[0]<<" -g <genotype file> -p <phenotype file> -c <covariate file> -cn <covariate name> -b <num_of_zb/10>  -v (for debugmode) -a (for getting accuracy)"<<endl;
+				cout<<"Correct Usage is "<<argv[0]<<" -g <genotype file> -p <phenotype file> -c <covariate file> -cn <covariate name> -b <num_of_zb>  "<<endl;
 				exit(-1);
 			}
 		}
