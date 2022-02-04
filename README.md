@@ -39,8 +39,9 @@ make
 After compiling the executble SCORE is present in the build directory. 
 To run SCORE, use
 
-*``./SCORE <command_line arguments> ``
+``./SCORE <command_line arguments> ``
 
+Notice this is a streaming version, which use less memory but requires two reads of the genome. 
 
 ### Parameters
 
@@ -62,31 +63,32 @@ The values in the brackets are the command line flags for running the code witho
 
 An example parameter file is provided in the example directory. 
 You can run the code using the command: 
-To compute genetic correlation: 
+To compute genetic correlation in the ``` build ``` directory with desired output destination:  
 ```
-./build/SCORE -g ./example/all -p pheno_1.pheno.plink -mpheno 1,2 -b 10 
+./SCORE -g ../example/all -p pheno_1.pheno.plink -mpheno 1,2 -b 10 -o [OUTPUT DESTINATION DEFINED]  
 ```
 To compute genetic correlation for shared-sample phenotypes: 
 ```
-./build/SCORE -g ./example/all -p pheno_1.pheno.plink -mpheno 1,2 -fill -b 10
+./SCORE -g ../example/all -p pheno_1.pheno.plink -mpheno 1,2 -fill -b 10
 ```
 To compute genetics correlation only for shared-sample phenotypes: 
 ```
-./build/SCORE -g ./example/all -p pheno_1.pheno.plink -mpheno 1,2 -fill -noh2g -b 10 
+./SCORE -g ../example/all -p pheno_1.pheno.plink -mpheno 1,2 -fill -noh2g -b 10 
 ```
+
 ### Format of output
 The output for the example provided is: 
 ```
 Source  Value
-Vg(0)   0.736654
-Vg/Vp(0)        0.732530
-SE(Vg/Vp)(0)    0.083919
-Vg(1)   0.154661
-Vg/Vp(1)        0.154493
-SE(Vg/Vp)(1)    0.019508
-rho_g(0,1)      0.030006
-gamma_g(0,1)    0.088896
-SE(gamma_g)(0,1)        0.101331
+Vg/Vp(0)(0)     0.732530
+Vg/Vp(1)(0)     0.154493
+rho_g(0,1)(0)   0.030006
+rho_e:  -1.006169
+gamma_g(0,1)(0) 0.088896
+SE(Vg/Vp)(0)(0) 0.065486
+SE(Vg/Vp)(1)(0) 0.019234
+SE(gamma_g)(0,1)(0)     0.083957
 ```
-Vg(i), Vg/Vp(i), and SE(Vg/Vp(0)) are the estimations of genetic variance component, heritability, and standard error for trait i. 
-rho_g(i,j), gamma_g(i,j) and SE(gamma_g)(i,j) are genetic covariance, genetic correlation, and the standard error of genetic correlation for trait i and j. 
+Vg(i)(p), Vg/Vp(i)(p), and SE(Vg/Vp(i)(p) are the estimations of genetic variance component, heritability, and standard error for trait i for annotation group p.
+Currently version has only one annotation group, which is the entire genome.The extension is under construction.  
+rho_g(i,j)(p), gamma_g(i,j)(p) and SE(gamma_g)(i,j)(p) are genetic covariance, genetic correlation, and the standard error of genetic correlation for trait i and j for annotation group p. 
