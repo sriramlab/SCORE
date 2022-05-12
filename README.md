@@ -92,6 +92,4 @@ SE(rho_g)(0,1)(0)       0.031751
 ```
 Vg(i)(p), Vg/Vp(i)(p), and SE(Vg/Vp(i)(p) are the estimations of genetic variance component, heritability, and standard error for trait i for annotation group p.
 Currently version has only one annotation group, which is the entire genome.The extension is under construction. 
-gamma_g and SE(gamma_g) is the estimate for genetic correlation and the corresponding standard error. 
-rho_g and SE(rho_g) is the estimate for genetic covariance and the corresponding standard error.  
-rho_g(i,j)(p), gamma_g(i,j)(p) and SE(gamma_g)(i,j)(p) are genetic covariance, genetic correlation, and the standard error of genetic correlation for trait i and j for annotation group p. 
+rho_g(i,j)(p), gamma_g(i,j)(p) , SE(rho_g)(0,1)(0) and  SE(gamma_g)(i,j)(p) are genetic covariance, genetic correlation, and the standard error of genetic covariance and  genetic correlation for trait i and j for annotation group p. 
