@@ -2100,16 +2100,23 @@ int main(int argc, char const *argv[]){
 		{
 		for(int fun_t=0;  fun_t<cat_num; fun_t++){
 		vector<double> jackknife_estimate(total_num_blocks, 1); 
+		vector<double> jackknife_covariance(total_num_blocks, 1); 
 		for(int block_t=0; block_t<total_num_blocks; block_t++)
 		{
 			jackknife_estimate[block_t] = genCov_estimates(block_t+1, phenoPairIdx*cat_num+fun_t)/ sqrt(h2g_estimates(block_t+1, j*cat_num+fun_t)) / sqrt(h2g_estimates(block_t+1, k*cat_num+fun_t));
-		//	cout<<jackknife_estimate[block_t]<<","<<h2g_estimates(block_t+1, j*cat_num+fun_t) << "," <<h2g_estimates(block_t+1, k*cat_num+fun_t)<<endl;
+			jackknife_covariance[block_t] =  genCov_estimates(block_t+1, phenoPairIdx*cat_num+fun_t); 
 		}
 		pair<double, double> jack_output; 
 		double estimate = genCov_estimates(0, phenoPairIdx*cat_num+fun_t)/sqrt(h2g_estimates(0, j*cat_num+fun_t)) / sqrt(h2g_estimates(0, k*cat_num+fun_t)); 	
 		jack_output=weightedjack(jackknife_estimate, jack_weight, estimate); 
 		string pheno_idx =  "SE(gamma_g)(" + to_string(j)+","+ to_string(k)+")("+to_string(fun_t)+")";
 		 fprintf(fp_output, "%s\t%f\n" , pheno_idx.c_str(), jack_output.second);
+		
+		pair<double, double> jack_covariance; 
+		double estimate_covariance = genCov_estimates(0, phenoPairIdx*cat_num+fun_t); 
+		jack_covariance=weightedjack(jackknife_covariance, jack_weight, estimate_covariance);
+                pheno_idx =  "SE(rho_g)(" + to_string(j)+","+ to_string(k)+")("+to_string(fun_t)+")";
+                 fprintf(fp_output, "%s\t%f\n" , pheno_idx.c_str(), jack_covariance.second);
 		//cout<<"SE(rg_("<<j<<","<<k<<")("<<fun_t<<")): "<<jack_output.second<<endl; 
 		}
 		phenoPairIdx++; 	

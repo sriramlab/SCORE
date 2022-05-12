@@ -65,15 +65,15 @@ An example parameter file is provided in the example directory.
 You can run the code using the command: 
 To compute genetic correlation in the ``` build ``` directory with desired output destination:  
 ```
-./SCORE -g ../example/all -p pheno_1.pheno.plink -mpheno 1,2 -b 10 -o [OUTPUT DESTINATION DEFINED]  
+./SCORE -g ../example/all -p ../example/pheno_1.pheno.plink -mpheno 1,2 -b 10 -o [OUTPUT DESTINATION DEFINED]  
 ```
 To compute genetic correlation for shared-sample phenotypes: 
 ```
-./SCORE -g ../example/all -p pheno_1.pheno.plink -mpheno 1,2 -fill -b 10
+./SCORE -g ../example/all -p ../example/pheno_1.pheno.plink -mpheno 1,2 -fill -b 10
 ```
 To compute genetics correlation only for shared-sample phenotypes: 
 ```
-./SCORE -g ../example/all -p pheno_1.pheno.plink -mpheno 1,2 -fill -noh2g -b 10 
+./SCORE -g ../example/all -p ../example/pheno_1.pheno.plink -mpheno 1,2 -fill -noh2g -b 10 
 ```
 
 ### Format of output
@@ -88,7 +88,10 @@ gamma_g(0,1)(0) 0.088896
 SE(Vg/Vp)(0)(0) 0.065486
 SE(Vg/Vp)(1)(0) 0.019234
 SE(gamma_g)(0,1)(0)     0.083957
+SE(rho_g)(0,1)(0)       0.031751
 ```
 Vg(i)(p), Vg/Vp(i)(p), and SE(Vg/Vp(i)(p) are the estimations of genetic variance component, heritability, and standard error for trait i for annotation group p.
-Currently version has only one annotation group, which is the entire genome.The extension is under construction.  
+Currently version has only one annotation group, which is the entire genome.The extension is under construction. 
+gamma_g and SE(gamma_g) is the estimate for genetic correlation and the corresponding standard error. 
+rho_g and SE(rho_g) is the estimate for genetic covariance and the corresponding standard error.  
 rho_g(i,j)(p), gamma_g(i,j)(p) and SE(gamma_g)(i,j)(p) are genetic covariance, genetic correlation, and the standard error of genetic correlation for trait i and j for annotation group p. 
