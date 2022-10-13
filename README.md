@@ -65,15 +65,15 @@ An example parameter file is provided in the example directory.
 You can run the code using the command: 
 To compute genetic correlation in the ``` build ``` directory with desired output destination:  
 ```
-./SCORE -g ../example/all -p ../example/pheno_1.pheno.plink -mpheno 1,2 -b 10 -o [OUTPUT DESTINATION DEFINED]  
+./SCORE -g ../example/all -p ../example/pheno_2.pheno.plink -mpheno 1,2 -b 10 -o [OUTPUT DESTINATION DEFINED]  
 ```
 To compute genetic correlation for shared-sample phenotypes: 
 ```
-./SCORE -g ../example/all -p ../example/pheno_1.pheno.plink -mpheno 1,2 -fill -b 10
+./SCORE -g ../example/all -p ../example/pheno_2.pheno.plink -mpheno 1,2 -fill -b 10
 ```
 To compute genetics correlation only for shared-sample phenotypes: 
 ```
-./SCORE -g ../example/all -p ../example/pheno_1.pheno.plink -mpheno 1,2 -fill -noh2g -b 10 
+./SCORE -g ../example/all -p ../example/pheno_2.pheno.plink -mpheno 1,2 -fill -noh2g -b 10 
 ```
 
 ### Format of output
